@@ -5,7 +5,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_compress import Compress
-from flask_cache import Cache
+from flask_caching import Cache
 from myMood.config import ProdConfig
 import os
 
@@ -29,7 +29,7 @@ def create_app(config_class=ProdConfig):
     login_manager.init_app(app)
     mail.init_app(app)
     compress.init_app(app)
-    cache.init_app(cache)
+    cache.init_app(app, config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 300})
 
     # Blueprints
     from myMood.users.routes import users

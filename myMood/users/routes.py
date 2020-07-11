@@ -37,7 +37,7 @@ users = Blueprint("users", __name__)
 
 
 @users.route("/user/login", methods=["GET", "POST"])
-@cache.cached(300, key_prefix="user_login")
+@cache.cached(key_prefix="user_login")
 def user_login():
     # bypass if user is authenticated
     if current_user.is_authenticated:
@@ -65,7 +65,7 @@ def user_login():
 
 
 @users.route("/user/register", methods=["GET", "POST"])
-@cache.cached(300, key_prefix="user_register")
+@cache.cached(key_prefix="user_register")
 def user_register():
     # bypass if user is authenticated
     if current_user.is_authenticated:
@@ -108,7 +108,7 @@ def user_logout():
 
 # Dashboard Routes
 @users.route("/", methods=["GET", "POST"])
-@cache.cached(300, key_prefix="dashboard")
+@cache.cached(key_prefix="dashboard")
 def dashboard():
     if not current_user.is_authenticated:
         return redirect(url_for("main.home"))
@@ -168,7 +168,7 @@ def unfollow_user(user_to_unfollow):
 
 # User Profile
 @users.route("/u/<user>", methods=["GET"])
-@cache.cached(300, key_prefix="dash_profile")
+@cache.cached(key_prefix="dash_profile")
 def dash_profile(user):
     formUpProfile = UpdateProfile()
     formUpProfilePic = UpdateProfilePic()
@@ -353,7 +353,7 @@ def dash_acc_settings(emailErr=None, passErr=None):
 
 # Discover
 @users.route("/discover", methods=["GET", "POST"])
-@cache.cached(300, key_prefix="dash_discover")
+@cache.cached(key_prefix="dash_discover")
 def dash_discover():
     formFollow = FollowForm()
     formSearch = SearchForm()
@@ -421,7 +421,7 @@ def search():
 
 # get posts of a user
 @users.route("/u/<user>/stories")
-@cache.cached(300, key_prefix="user_stories")
+@cache.cached(key_prefix="user_stories")
 def user_stories(user):
     # page = request.args.get("p", 1, type=int)
     u = User.query.filter_by(username=user).first_or_404()
@@ -441,7 +441,7 @@ def user_stories(user):
 
 # Reset Password > Send a Request Token
 @users.route("/reset/password", methods=["GET", "POST"])
-@cache.cached(300, key_prefix="reset_password_page")
+@cache.cached(key_prefix="reset_password_page")
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for("main.home"))

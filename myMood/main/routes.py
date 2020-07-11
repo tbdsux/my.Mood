@@ -8,7 +8,7 @@ main = Blueprint("main", __name__)
 
 
 @main.route("/home", methods=["GET", "POST"])
-@cache.cached(300, key_prefix="home_page")
+@cache.cached(key_prefix="home_page")
 def home():
     form = RegisterForm()
 
@@ -38,13 +38,13 @@ def home():
 
 
 @main.route("/about")
-@cache.cached(300, key_prefix="about_page")
+@cache.cached(key_prefix="about_page")
 def about():
     return render_template("main/about.html", title="About")
 
 
 @main.route("/discover/g")
-@cache.cached(300, key_prefix="discover_page")
+@cache.cached(key_prefix="discover_page")
 def discover():
     users = User.query.order_by(func.random()).limit(6).all()
     stories = (
