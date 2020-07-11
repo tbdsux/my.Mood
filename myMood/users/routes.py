@@ -9,7 +9,7 @@ from flask import (
 )
 from sqlalchemy.sql.expression import func
 from flask_login import login_user, current_user, logout_user, login_required
-from myMood import db, bcrypt
+from myMood import db, bcrypt, cache
 from myMood.models import User, Post
 from myMood.users.forms import (
     RegisterForm,
@@ -37,6 +37,7 @@ users = Blueprint("users", __name__)
 
 
 @users.route("/user/login", methods=["GET", "POST"])
+@cache.cached(300, key_prefix="user_login")
 def user_login():
     # bypass if user is authenticated
     if current_user.is_authenticated:
@@ -64,6 +65,7 @@ def user_login():
 
 
 @users.route("/user/register", methods=["GET", "POST"])
+@cache.cached(300, key_prefix="user_register")
 def user_register():
     # bypass if user is authenticated
     if current_user.is_authenticated:
@@ -106,6 +108,7 @@ def user_logout():
 
 # Dashboard Routes
 @users.route("/", methods=["GET", "POST"])
+@cache.cached(300, key_prefix="dashboard")
 def dashboard():
     if not current_user.is_authenticated:
         return redirect(url_for("main.home"))
@@ -130,6 +133,7 @@ def dashboard():
             )
             db.session.add(story)
             db.session.commit()
+            cache.delete("user_stories")
             return redirect(url_for("users.dashboard"))
     return render_template(
         "dashboard/index.html", form=form, dashboard_title="Home", stories=stories,
@@ -145,6 +149,7 @@ def follow_user(user_to_follow):
             target_user = User.query.filter_by(username=user_to_follow).first()
             current_user.follow(target_user)
             db.session.commit()
+            cache.delete("user_stories")
             return redirect(url_for("users.dash_profile", user=user_to_follow))
 
 
@@ -157,11 +162,13 @@ def unfollow_user(user_to_unfollow):
             target_user = User.query.filter_by(username=user_to_unfollow).first()
             current_user.unfollow(target_user)
             db.session.commit()
+            cache.delete("user_stories")
             return redirect(url_for("users.dash_profile", user=user_to_unfollow))
 
 
 # User Profile
 @users.route("/u/<user>", methods=["GET"])
+@cache.cached(300, key_prefix="dash_profile")
 def dash_profile(user):
     formUpProfile = UpdateProfile()
     formUpProfilePic = UpdateProfilePic()
@@ -239,6 +246,7 @@ def update_BgImage(user):
                 pic_file = save_bg_image(formUpBgImage.image_background.data)
                 current_user.acc_image_bg = pic_file
                 db.session.commit()
+                cache.delete("dash_profile")
                 return redirect(
                     url_for("users.dash_profile", user=current_user.username)
                 )
@@ -264,6 +272,7 @@ def update_ProfilePic(user):
                 pic_file = save_profile_pic(formUpProfilePic.profile_pic.data)
                 current_user.acc_image = pic_file
                 db.session.commit()
+                cache.delete("dash_profile")
                 return redirect(
                     url_for("users.dash_profile", user=current_user.username)
                 )
@@ -278,6 +287,7 @@ def update_Profile(user):
             current_user.username = formUpProfile.username.data
             current_user.random_say = formUpProfile.random_say.data
             db.session.commit()
+            cache.delete("dash_profile")
             return redirect(url_for("users.dash_profile", user=current_user.username))
     return redirect(url_for("users.dash_profile", user=current_user.username))
 
@@ -290,6 +300,7 @@ def update_Whoami(user):
         if formUpWhoami.validate_on_submit():
             current_user.whoami = formUpWhoami.whoami.data
             db.session.commit()
+            cache.delete("dash_profile")
             return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
@@ -304,6 +315,7 @@ def update_SocialLinks(user):
             current_user.social_ig = formUpSocialLinks.ig.data
             current_user.social_yt = formUpSocialLinks.yt.data
             db.session.commit()
+            cache.delete("dash_profile")
             return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
@@ -341,6 +353,7 @@ def dash_acc_settings(emailErr=None, passErr=None):
 
 # Discover
 @users.route("/discover", methods=["GET", "POST"])
+@cache.cached(300, key_prefix="dash_discover")
 def dash_discover():
     formFollow = FollowForm()
     formSearch = SearchForm()
@@ -384,24 +397,17 @@ def search():
     if formSearch.validate_on_submit():
         return redirect(url_for("users.search", query=formSearch.search_field.data))
 
-    # users = User.query.msearch(q, fields=["username"]).filter(
-    #     current_user.username != q
-    # )
-    # stories = Post.query.msearch(q, fields=["content"]).order_by(
-    #     Post.date_posted.desc()
-    # )
+    # get users
     users = User.query.filter(
         User.username.ilike("%" + q + "%"), current_user.username != q
     ).all()
-    # stories = (
-    #     Post.query.filter(Post.content.ilike("%" + q + "%"))
-    #     .order_by(Post.date_posted.desc())
-    #     .all()
-    # )
+    # get stories
     s = current_user
     stories = s.search_posts(q).all()
 
+    # pass the search query to the inut value
     formSearch.search_field.data = q
+
     return render_template(
         "dashboard/search.html",
         formFollow=formFollow,
@@ -415,6 +421,7 @@ def search():
 
 # get posts of a user
 @users.route("/u/<user>/stories")
+@cache.cached(300, key_prefix="user_stories")
 def user_stories(user):
     # page = request.args.get("p", 1, type=int)
     u = User.query.filter_by(username=user).first_or_404()
@@ -434,6 +441,7 @@ def user_stories(user):
 
 # Reset Password > Send a Request Token
 @users.route("/reset/password", methods=["GET", "POST"])
+@cache.cached(300, key_prefix="reset_password_page")
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for("main.home"))

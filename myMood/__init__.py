@@ -4,6 +4,8 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_compress import Compress
+from flask_cache import Cache
 from myMood.config import ProdConfig
 import os
 
@@ -13,6 +15,8 @@ login_manager = LoginManager()
 login_manager.login_view = "users.user_login"
 login_manager.login_message_category = "blue"
 mail = Mail()
+compress = Compress()
+cache = Cache()
 
 
 def create_app(config_class=ProdConfig):
@@ -24,6 +28,8 @@ def create_app(config_class=ProdConfig):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    compress.init_app(app)
+    cache.init_app(cache)
 
     # Blueprints
     from myMood.users.routes import users

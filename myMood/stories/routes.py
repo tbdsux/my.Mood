@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, abort, Blueprint
 from flask_login import current_user, login_required
-from myMood import db
+from myMood import db, cache
 from myMood.models import User, Post
 from myMood.stories.forms import NewStoryForm
 
@@ -8,6 +8,7 @@ stories = Blueprint("stories", __name__)
 
 
 @stories.route("/u/<user>/stories/<int:story_id>", methods=["GET"])
+@cache.cached(300, key_prefix="story_user")
 def user_post(user, story_id):
     form = NewStoryForm()
     story = Post.query.get_or_404(story_id)
@@ -33,6 +34,7 @@ def update_post(user, story_id):
             story.emotion = form.emotion.data
             story.state = form.state.data
             db.session.commit()
+            cache.delete("story_user")
             return redirect(
                 url_for(
                     "stories.user_post", user=current_user.username, story_id=story.id
@@ -49,6 +51,7 @@ def delete_post(user, story_id):
     if request.method == "POST":
         db.session.delete(story)
         db.session.commit()
+        cache.delete("story_user")
         return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
@@ -56,6 +59,7 @@ def delete_post(user, story_id):
 
 # all stories with followed ones
 @stories.route("/stories/all")
+@cache.cached(300, key_prefix="all_stories")
 def all_stories():
     s = current_user
     stories = s.followed_posts().all()
@@ -67,6 +71,7 @@ def all_stories():
 
 # stories of user only
 @stories.route("/u/<user>/stories/all")
+@cache.cached(300, key_prefix="all_user_stories")
 def all_user_stories(user):
     u = User.query.filter_by(username=user).first_or_404()
     stories = Post.query.filter_by(author=u).order_by(Post.date_posted.desc()).all()
@@ -85,6 +90,7 @@ def all_user_stories(user):
 
 
 @stories.route("/discover/stories/all")
+@cache.cached(300, key_prefix="all_public_stories")
 def all_public_stories():
     stories = (
         Post.query.filter_by(state="public").order_by(Post.date_posted.desc()).all()

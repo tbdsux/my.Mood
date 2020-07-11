@@ -29,3 +29,4 @@ class ProdConfig:
     MAIL_USERNAME = "ima.boringdude@gmail.com"
     MAIL_PASSWORD = "Lecaj123!"
     SQLALCHEMY_DATABASE_URI = "postgres://grvbhekhqlvgsa:2511c94f0b10581db1bab08ee8796c29ec03348cd221dc8d3e58ffe95bd8a0bf@ec2-52-202-146-43.compute-1.amazonaws.com:5432/dbpd7s2v4pejum"
+    CACHE_TYPE = "simple"
