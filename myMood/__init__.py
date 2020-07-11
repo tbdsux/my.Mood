@@ -6,8 +6,9 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_compress import Compress
 from flask_caching import Cache
-import pylibmc
-from flask_session import Session
+
+# import pylibmc
+# from flask_session import Session
 from myMood.config import ProdConfig
 import os
 
@@ -20,7 +21,7 @@ login_manager.session_protection = "strong"
 mail = Mail()
 compress = Compress()
 cache = Cache()
-sess = Session()
+# sess = Session()
 
 
 def create_app(config_class=ProdConfig):
@@ -33,9 +34,9 @@ def create_app(config_class=ProdConfig):
     login_manager.init_app(app)
     mail.init_app(app)
     compress.init_app(app)
-    sess.init_app(app)
+    # sess.init_app(app)
 
-    cache.init_app(app, config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 300})
+    cache.init_app(app, config={"CACHE_TYPE": "simple"})
     # Using Memcache
     cache_servers = os.environ.get("MEMCACHIER_SERVERS")
     # if cache_servers == None:
