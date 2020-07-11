@@ -19,7 +19,7 @@ login_manager.login_message_category = "blue"
 mail = Mail()
 compress = Compress()
 cache = Cache()
-session = session()
+session = Session()
 
 
 def create_app(config_class=ProdConfig):
