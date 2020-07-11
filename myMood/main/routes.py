@@ -7,8 +7,12 @@ from sqlalchemy.sql.expression import func
 main = Blueprint("main", __name__)
 
 
+def is_post():
+    return request.method == "POST"
+
+
 @main.route("/home", methods=["GET", "POST"])
-@cache.cached(key_prefix="home_page")
+@cache.cached(unless=is_post)
 def home():
     form = RegisterForm()
 
@@ -38,13 +42,13 @@ def home():
 
 
 @main.route("/about")
-@cache.cached(key_prefix="about_page")
+@cache.cached()
 def about():
     return render_template("main/about.html", title="About")
 
 
 @main.route("/discover/g")
-@cache.cached(key_prefix="discover_page")
+@cache.cached()
 def discover():
     users = User.query.order_by(func.random()).limit(6).all()
     stories = (

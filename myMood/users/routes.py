@@ -6,6 +6,7 @@ from flask import (
     request,
     Blueprint,
     current_app,
+    session,
 )
 from sqlalchemy.sql.expression import func
 from flask_login import login_user, current_user, logout_user, login_required
@@ -66,6 +67,7 @@ def user_login():
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
             if user and bcrypt.check_password_hash(user.password, form.password.data):
+                session["user"] = request.form["email"]
                 login_user(user, remember=form.remember.data)
                 next_page = request.args.get("next")
                 return (
@@ -118,6 +120,7 @@ def user_register():
 
 @users.route("/logout")
 def user_logout():
+    session.pop("user", None)
     logout_user()
     return redirect(url_for("users.user_login"))
 

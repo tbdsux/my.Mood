@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -16,10 +16,11 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 login_manager.login_view = "users.user_login"
 login_manager.login_message_category = "blue"
+login_manager.session_protection = "strong"
 mail = Mail()
 compress = Compress()
 cache = Cache()
-session = Session()
+sess = Session()
 
 
 def create_app(config_class=ProdConfig):
@@ -32,7 +33,7 @@ def create_app(config_class=ProdConfig):
     login_manager.init_app(app)
     mail.init_app(app)
     compress.init_app(app)
-    session.init_app(app)
+    sess.init_app(app)
 
     # Using Memcache
     cache_servers = os.environ.get("MEMCACHIER_SERVERS")
@@ -95,10 +96,6 @@ def create_app(config_class=ProdConfig):
                 },
             ),
         )
-
-    # session
-    session["key"] = "value"
-    session.get("key", "not set")
 
     # Blueprints
     from myMood.users.routes import users
