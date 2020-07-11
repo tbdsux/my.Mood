@@ -1,1 +1,1 @@
-web: gunicorn app:myMood
+web: gunicorn myMood:app
