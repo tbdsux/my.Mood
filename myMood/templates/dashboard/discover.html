@@ -1,0 +1,122 @@
+{% extends "dashboard.html" %}
+
+{% block dash_content %}
+<!-- Discover -->
+<div class="w-5/6 mx-auto">
+    <!-- search bar -->
+     <div class="w-full">
+        <form action="" class="w-full flex items-center flex-row" method="post">
+            {{ formSearch.hidden_tag() }}
+            <div class="relative flex items-center w-full">
+                <i class="fas fa-search absolute ml-4 text-gray-500" id="search-icon"></i>
+                {{ formSearch.search_field(class="text-black pl-12 pr-4 py-1 tracking-wider focus:text-pinkish border-2 border-gray-500 focus:outline-none focus:border-pinkish w-full text-sm", placeholder="Search...", onfocus="iconSearch()", onblur="iconSearch()") }}
+            </div>
+            {{ formSearch.search(class="bg-darkish text-white py-1 px-4 border-2 border-transparent hover:bg-green hover:border-green text-sm cursor-pointer rounded") }}
+        </form>
+    </div>
+    <!-- random users -->
+    <div class="py-3">
+        <h3 class="text-gray-500">Random Users</h3>
+        <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 overflow-hidden">
+            {% for user in users %}
+            <!-- user -->
+            <div href="#" class="bg-darkish rounded-md">
+                <div class="relative h-40 w-full">
+                    <img src="{{ url_for('static', filename='profile_pics/' + user.acc_image) }}" alt="" class="absolute w-full h-full object-cover rounded-t-md">
+                </div>
+                <h4 class="tracking-wide p-2 truncate text-center"><a href="{{ url_for('users.dash_profile', user=user.username) }}" class="hover:text-gray-500 tracking-wide">{{ user.username }}</a></h4>
+                <div class="text-center">
+                    {% if current_user.is_following(user) %}
+                        <form action="{{ url_for('users.unfollow_user', user_to_unfollow=user.username) }}" method="post">
+                            {{ formFollow.hidden_tag() }}
+                            {{ formFollow.submit(value="Unfollow", class="bg-pinkish px-4 text-center mb-2 rounded cursor-pointer py-1 text-sm hover:bg-blue") }}
+                        </form>
+                    {% else %}
+                        <form action="{{ url_for('users.follow_user', user_to_follow=user.username) }}" method="post">
+                            {{ formFollow.hidden_tag() }}
+                            {{ formFollow.submit(value="Follow", class="bg-blue px-10 text-center mb-2 rounded cursor-pointer py-1 text-sm hover:bg-pinkish") }}
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr class="border-gray-500 mt-1 mb-3">
+
+    <!-- public posts -->
+    <div class="">
+        <h3 class="text-gray-500">Public Stories</h3>
+        <div class="pt-2">
+            {% for story in stories %}
+            <!-- post -->
+            <div class="bg-darker p-3 rounded-lg mb-2">
+                <!-- post info -->
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div class="relative h-10 w-10">
+                            <img src="{{ url_for('static', filename='profile_pics/' + story.author.acc_image) }}" alt="" class="absolute w-full h-full object-cover rounded-full z-0">
+                        </div>
+                        <div class="user-info flex flex-col">
+                            <div class="flex items-center">
+                                <h4 class="mx-2 text-blue tracking-wide">{{ story.author.username }}</h4>
+                                {% if story.emotion == "happy" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Happy</span> 😀</p>
+                                {% elif story.emotion == "blessed" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Blessed</span> 😇</p>
+                                {% elif story.emotion == "loved" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Loved</span> 😍</p>
+                                {% elif story.emotion == "lovely" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Lovely</span> 😊</p>
+                                {% elif story.emotion == "sad" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sad</span> 🙁</p>
+                                {% elif story.emotion == "surprised" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Surprised</span> 😱</p>
+                                {% elif story.emotion == "angry" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Angry</span> 😡</p>
+                                {% elif story.emotion == "excited" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Excited</span> 😁</p>
+                                {% elif story.emotion == "embarassed" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Embarrased</span> 😳</p>
+                                {% elif story.emotion == "thankful" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Thankful</span> 🤗</p>
+                                {% elif story.emotion == "in_love" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">In Love</span> 🥰</p>
+                                {% elif story.emotion == "crazy" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Crazy</span> 😆</p>
+                                {% elif story.emotion == "sick" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sick</span> 🤒</p>
+                                {% elif story.emotion == "tired" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Tired</span> 😓</p>
+                                {% elif story.emotion == "sleepy" %}
+                                    <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sleepy</span> 🥱</p>
+                                {% endif %}
+                            </div>
+                            <p class="ml-4 text-gray-700 post-date text-sx">on {{ story.date_posted.strftime("%B %d, %Y") }}</p>
+                        </div>
+                    </div>
+                    <p class="pt-1 text-gray-700 post-date text-xs hidden sm:block">{{ story.date_posted.strftime("%I:%M %p") }}</p>
+                </div>
+                <!-- post main -->
+                <div class="flex justify-center items-center feel-{{ story.emotion }} mt-2">
+                    <div class="pt-5 pb-6 px-3 md:px-6 text-center">
+                        <h2 class="font-bold tracking-wide text-2xl sm:text-3xl">{{ story.content }}</h2>
+                    </div>
+                </div>
+                <p class="pt-1 text-gray-700 post-date text-xs block sm:hidden">{{ story.date_posted.strftime("%I:%M %p") }}</p>
+            </div>
+            {% else %}
+            <!-- show text "No Posts" -->
+            <div class="bg-darker p-3 rounded-lg mb-2">
+                <h1 class="text-gray-200 text-xl font-bold tracking-wider">No Stories to Show</h1>
+            </div>
+            {% endfor %}
+            <!-- more stories -->
+            {% if not stories|length == 0 %}
+            <a href="{{ url_for('stories.all_public_stories') }}" type="button" class="border-2 border-darkish rounded-lg text-center w-full py-1 bg-darkish text-sm hover:bg-gray-600 hover:border-gray-600">More Stories</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock dash_content %}

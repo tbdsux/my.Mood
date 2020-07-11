@@ -1,0 +1,46 @@
+{% extends "base_main.html" %}
+
+{% block content %}
+	<div class="w-full h-full">
+		<div class="w-full pt-24 bg-dark text-white pb-10">
+			<div class="w-5/6 mx-auto">
+				<h2 class="text-gray-500 text-lg font-bold tracking-wide uppercase">About Us</h2>
+				<!-- about -->
+				<div class="px-6 py-4 text-gray-600 text-xl text-center">
+					<p class="mb-2"><span class="text-pinkish">my.Mood</span> is a simple micro-blogging web app that focuses on short posts, tweets or notes about what a user wants to say with what they currently feel, or their mood.</p>
+					<p>This can be a mini-social network app but with no like, comment and user messaging systems and image sharing. It mainly focuses in the posting of stories with words and a follow system between users.</p>
+				</div>
+
+				<!-- changelog -->
+				<div class="mt-4">
+					<h2 class="text-gray-500 font-bold tracking-wide">Changelog:</h2>
+					<div class="ml-3">
+						<ul>
+                            <li class="text-gray-700 italic leading-loose underline">July 10, 2020</li>
+                                <ul class="px-6">
+                                    <li class="list-disc text-gray-600">Added <span class="text-success">reset password</span> capability</li>
+                                    <li class="list-disc text-gray-600">Added username validation (usernames should not contain any spaces)</li>
+                                    <li class="list-disc text-gray-600">Added error pages</li>
+                                    <li class="list-disc text-gray-600">Removed flask-msearch and used the native db search function (re-added the repr)</li>   
+                                </ul>
+							<li class="text-gray-700 italic leading-loose underline">July 09, 2020</li>
+								<ul class="px-6">
+									<li class="list-disc text-gray-600">Edit home and forms templates.</li>
+									<li class="list-disc text-gray-600">Fixed <span class="text-redish">sqlalchemy.exc.InvalidRequestError</span> (removed __repr__ from the User model).</li>
+									<li class="list-disc text-gray-600">Added <span class="text-blue">search</span> function capability.</li>	
+								</ul>
+							<li class="text-gray-700 italic leading-loose underline">July 08, 2020</li>
+								<ul class="px-6">
+									<li class="list-disc text-gray-600">Fixed validation problem of the 'Account Settings' update.</li>
+								</ul>
+							<li class="text-gray-700 italic leading-loose underline">July 07, 2020</li>
+								<ul class="px-6">
+									<li class="list-disc text-gray-600">Edit 'Account Settings' section from dashboard.</li>
+								</ul>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

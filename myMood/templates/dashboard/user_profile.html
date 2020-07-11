@@ -1,0 +1,513 @@
+{% extends "dashboard.html" %}
+
+{% block dash_content %}
+<!-- User Profile -->
+<div class="w-5/6 mx-auto">
+    <!-- main profile -->
+    <div>
+        <!-- image profile -->
+        <div class="h-40 w-full relative" x-data="{ 'showModalBgImg': false, 'showModalPfImg': false }">
+            <!-- start UPDATE BACKGROUND IMAGE -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showModalBgImg" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showModalBgImg }">
+                       <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showModalBgImg" @click.away="showModalBgImg = false">
+                            <div class="flex justify-between items-center pb-3">
+                                <p class="text-2xl font-bold text-gray-500">Change Background Image</p>
+                                <div class="cursor-pointer z-50" @click="showModalBgImg = false">
+                                    <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                        <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                    <div class="pt-4">
+                        <form class="px-2" method="post" enctype="multipart/form-data" action="{{ url_for('users.update_BgImage', user=current_user.username) }}">
+                            {{ formUpBgImage.hidden_tag() }}
+                            <label class="flex flex-row items-center justify-center px-4 py-2 bg-dark text-gray-300 rounded-lg shadow-lg tracking-wide focus:outline-none cursor-pointer hover:bg-blue hover:text-white">
+                                <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                </svg>
+                                <span class="text-base leading-normal ml-2 truncate" id="bgImgName">Select Image...</span>
+                                {{ formUpBgImage.image_background(class="hidden", id="upBgImg") }}
+                                {% if formUpBgImage.image_background.errors %}
+                                    <div class="pt-1">
+                                        {% for error in formUpBgImage.image_background.errors %}
+                                        <span class="text-redish">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </label>
+                            <!-- image preview -->
+                            <div class="mt-4 relative h-32 w-full">
+                                <img id="prevBgImg" class="absolute w-full h-full object-cover">
+                            </div>
+                            <!-- submit -->
+                            <div class="w-full my-4">
+                                {{ formUpBgImage.update(class="w-full bg-darkish py-2 text-gray-300 rounded-lg hover:bg-blue focus:outline-none cursor-pointer") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end UPDATE BACKGROUND IMAGE -->
+
+            <!-- start UPDATE PROFILE PICTURE -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showModalPfImg" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showModalPfImg }">
+                <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showModalPfImg" @click.away="showModalPfImg = false">
+                    <div class="flex justify-between items-center pb-3">
+                        <p class="text-2xl font-bold text-gray-500">Update Profile Picture</p>
+                        <div class="cursor-pointer z-50" @click="showModalPfImg = false">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <form class="px-2" method="post" enctype="multipart/form-data" action="{{ url_for('users.update_ProfilePic', user=current_user.username) }}">
+                            {{ formUpProfilePic.hidden_tag() }}
+                            <label class="flex flex-row items-center justify-center px-4 py-2 bg-dark text-gray-300 rounded-lg shadow-lg tracking-wide focus:outline-none cursor-pointer hover:bg-blue hover:text-white">
+                                <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                                </svg>
+                                <span class="text-base leading-normal ml-2 truncate" id="pfImgName">Select Image...</span>
+                                {{ formUpProfilePic.profile_pic(class="hidden", id="upPfImg") }}
+                                {% if formUpProfilePic.profile_pic.errors %}
+                                    <div class="pt-1">
+                                        {% for error in formUpProfilePic.profile_pic.errors %}
+                                        <span class="text-redish">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </label>
+                            <!-- image preview -->
+                            <div class="mt-4 relative h-32 w-32 mx-auto">
+                                <img id="prevPfImg" class="absolute w-full h-full object-cover rounded-full">
+                            </div>
+                            <!-- submit -->
+                            <div class="w-full my-4">
+                                {{ formUpProfilePic.update(class="w-full bg-darkish py-2 text-gray-300 rounded-lg hover:bg-blue focus:outline-none cursor-pointer") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end UPDATE PROFILE PICTURE -->
+
+            <!-- user bg photo -->
+            <button type="button" class="cursor-default w-full h-full focus:outline-none" onmouseenter="showUpUserBG()" onmouseleave="hideUpUserBG()">
+                <img src="{{ url_for('static', filename='profile_pics/bg_profile/' + user.acc_image_bg) }}" alt="" class="h-full w-full object-cover object-top">
+                {% if user == current_user %}
+                    <a id="editUBG" @click="showModalBgImg = true" type="button" class="cursor-pointer hidden absolute top-0 right-0 text-xs sm:text-sm bg-darkish text-gray-500 py-1 px-2 opacity-75 hover:opacity-100 rounded-lg">Change Background</a>
+                {% endif %}
+            </button>
+            <!-- user image -->
+            <button type="button" class="cursor-default absolute h-24 sm:h-32 w-24 sm:w-32 bottom-0 left-50 -ml-12 sm:-ml-16 -mb-4 sm:-mb-8 focus:outline-none" onmouseenter="showUpUserPF()" onmouseleave="hideUpUserPF()">
+                <img src="{{ url_for('static', filename='profile_pics/' + user.acc_image) }}" alt="" class="w-full h-full object-cover rounded-full">
+                {% if user == current_user %}
+                    <a id="editUPF" @click="showModalPfImg = true" type="button" class="cursor-pointer hidden absolute bottom-0 left-50 text-xs sm:text-sm bg-darkish text-gray-500 py-1 px-3 opacity-75 -ml-8 -mb-1 hover:opacity-100 rounded-lg">Update</a>
+                {% endif %}
+            </button>
+        </div>
+        <div class="pt-6 pb-4 bg-darker" x-data="{ 'showModalProfile': false, 'showUserFollow': false, 'showUserFollowing': false }">
+            {% if user == current_user %}
+            <!-- start EDIT PROFILE -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showModalProfile" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showModalProfile }">
+                <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showModalProfile" @click.away="showModalProfile = false">
+                    <div class="flex justify-between items-center pb-3">
+                        <p class="text-2xl font-bold text-gray-500">Edit Profile</p>
+                        <div class="cursor-pointer z-50" @click="showModalProfile = false">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="">
+                        <form class="px-2" method="post" action="{{ url_for('users.update_Profile', user=current_user.username) }}">
+                            {{ formUpProfile.hidden_tag() }}
+                            <div class="flex flex-col">
+                                {{ formUpProfile.username.label(class="pt-2 text-gray-500") }}
+                                {% if formUpProfile.username.errors %}
+                                    {{ formUpProfile.username(class="placeholder-gray-600 text-sm text-gray-600 focus:text-gray-200 p-2 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none", placeholder="Enter a new username") }}
+                                    <div class="pt-1">
+                                        {% for error in formUpProfile.username.errors %}
+                                        <span class="text-redish">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ formUpProfile.username(class="placeholder-gray-600 text-sm text-gray-600 focus:text-gray-200 p-2 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none", placeholder="Enter a new username") }}
+                                {% endif %}
+                            </div>
+                            <div class="flex flex-col">
+                                {{ formUpProfile.random_say.label(class="pt-2 text-gray-500") }}
+                                {% if formUpProfile.random_say.errors %}
+                                    {{ formUpProfile.random_say(class="placeholder-gray-600 h-24 sm:h-20 text-sm text-gray-600 focus:text-gray-200 p-2 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none", placeholder="You can leave it blank but would've been better if put in something.", maxlength=50) }}
+                                    <div class="pt-1">
+                                        {% for error in formUpProfile.random_say.errors %}
+                                        <span class="text-redish">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ formUpProfile.random_say(class="placeholder-gray-600 h-24 sm:h-20 text-sm text-gray-600 focus:text-gray-200 p-2 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none", placeholder="You can leave it blank but would've been better if put in something.", maxlength=50) }}
+                                {% endif %}
+                            </div>
+                            <div class="pt-3">
+                                {{ formUpProfile.update(class="w-full bg-darkish py-2 text-gray-300 rounded-lg hover:bg-blue focus:outline-none cursor-pointer") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end EDIT PROFILE -->
+            {% endif %}
+            <!-- start User Followers -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showUserFollow" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showUserFollow }">
+                <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showUserFollow" @click.away="showUserFollow = false">
+                    <div class="flex justify-between items-center pb-3">
+                        {% if user == current_user %}
+                            <p class="text-2xl font-bold text-gray-500">Your Followers</p>
+                        {% else %}
+                            <p class="text-2xl text-gray-500"><span class="font-bold tracking-wide">{{ user.username }}'s</span> <span class="font-normal">Followers</span></p>
+                        {% endif %}
+                        <div class="cursor-pointer z-50" @click="showUserFollow = false">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-3 h-64 overflow-y-scroll">
+                        {% for follower in user.followers %}
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center">
+                                    <img src="{{ url_for('static', filename='profile_pics/' + follower.acc_image) }}" alt="" class="h-10 w-10 object-cover rounded-full">
+                                    <h4 class="text-lg text-gray-600 tracking-wider ml-2 truncate"><a href="{{ url_for('users.dash_profile', user=follower.username) }}">{{ follower.username }}</a></h4>
+                                </div>
+                                {% if user == current_user %}
+                                    <form action="{{ url_for('users.follow_user', user_to_follow=follower.username) }}" method="post">
+                                        {{ formFollow.hidden_tag() }}
+                                        {{ formFollow.submit(value="Follow", class="bg-blue px-10 text-center rounded cursor-pointer py-1 text-sm hover:bg-pinkish") }}
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- end User Followers -->
+            <!-- start User Following -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showUserFollowing" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showUserFollowing }">
+                <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showUserFollowing" @click.away="showUserFollowing = false">
+                    <div class="flex justify-between items-center pb-3">
+                        {% if user == current_user %}
+                            <p class="text-2xl font-bold text-gray-500">Users You Followed</p>
+                        {% else %}
+                            <p class="text-2xl text-gray-500"><span class="font-normal">Followed by</span> <span class="font-bold tracking-wide">{{ user.username }}'s</span></p>
+                        {% endif %}
+                        
+                        <div class="cursor-pointer z-50" @click="showUserFollowing = false">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-3 h-64 overflow-y-scroll">
+                        {% for follower in user.followed %}
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center">
+                                    <img src="{{ url_for('static', filename='profile_pics/' + follower.acc_image) }}" alt="" class="h-10 w-10 object-cover rounded-full">
+                                    <h4 class="text-lg text-gray-600 tracking-wider ml-2 truncate"><a href="{{ url_for('users.dash_profile', user=follower.username) }}">{{ follower.username }}</a></h4>
+                                </div>
+                                {% if user == current_user %}
+                                    <form action="{{ url_for('users.unfollow_user', user_to_unfollow=follower.username) }}" method="post">
+                                        {{ formFollow.hidden_tag() }}
+                                        {{ formFollow.submit(value="Unfollow", class="bg-pinkish px-4 text-center rounded cursor-pointer py-1 text-sm hover:bg-blue") }}
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- end User Following -->
+            <div class="hidden sm:block pt-4 text-center">
+                <div class="flex justify-center items-center px-12 md:px-16 lg:px-20 xl:px-24">
+                    <a href="#" type="button" @click="showUserFollow = true" class="text-sm text-gray-700 hover:text-gray-600"><span class="font-bold">{{ user.followers.count() }}</span><br />followers</a>
+                    <div class="text-center w-1/2 lg:w-2/3 mx-auto">
+                        <h3 class="text-xl font-bold tracking-wider text-gray-300">{{ user.username }}</h3>
+                        {% if user.random_say %}
+                            <p class="text-sm text-gray-600 tracking-wide">{{ user.random_say }}</p>
+                        {% else %}
+                            <p class="text-sm text-gray-600 tracking-wide"></p>
+                        {% endif %}
+
+                        {% if user == current_user %}
+                            <a @click="showModalProfile = true" type="button" class="cursor-pointer text-sm mt-2 px-2 text-gray-700 border border-darkish hover:bg-darkish hover:border-darkish hover:text-white"><i class="fas fa-user mr-2"></i>Edit Profile</a>
+                        {% else %}
+                            <div class="text-center">
+                                {% if current_user.is_following(user) %}
+                                    <form action="{{ url_for('users.unfollow_user', user_to_unfollow=user.username) }}" method="post">
+                                        {{ formFollow.hidden_tag() }}
+                                        {{ formFollow.submit(value="Unfollow", class="bg-pinkish px-4 text-center mt-2 rounded cursor-pointer py-1 text-sm hover:bg-blue") }}
+                                    </form>
+                                {% else %}
+                                    <form action="{{ url_for('users.follow_user', user_to_follow=user.username) }}" method="post">
+                                        {{ formFollow.hidden_tag() }}
+                                        {{ formFollow.submit(value="Follow", class="bg-blue px-10 text-center mt-2 rounded cursor-pointer py-1 text-sm hover:bg-pinkish") }}
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <a href="#" type="button" @click="showUserFollowing = true" class="text-sm text-gray-700 hover:text-gray-600"><span class="font-bold">{{ user.followed.count() }}</span><br />following</a>
+                </div>
+            </div>
+            <div class="sm:hidden text-center">
+                <h3 class="text-xl font-bold tracking-wider text-gray-300">{{ user.username }}</h3>
+                {% if user.random_say %}
+                    <p class="text-sm text-gray-600 tracking-wide px-6">{{ user.random_say }}</p>
+                {% else %}
+                    <p class="text-sm text-gray-600 tracking-wide px-6"></p>
+                {% endif %}
+                {% if user == current_user %}
+                    <a @click="showModalProfile = true" type="button" class="cursor-pointer text-sm mt-2 mb-3 px-2 text-gray-700 border border-darkish hover:bg-darkish hover:border-darkish hover:text-white"><i class="fas fa-user mr-2"></i>Edit Profile</a>
+                {% else %}
+                    <div class="text-center">
+                        {% if current_user.is_following(user) %}
+                            <form action="{{ url_for('users.unfollow_user', user_to_unfollow=user.username) }}" method="post">
+                                {{ formFollow.hidden_tag() }}
+                                {{ formFollow.submit(value="Unfollow", class="bg-pinkish px-4 text-center mt-2 rounded cursor-pointer py-1 text-sm hover:bg-blue") }}
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('users.follow_user', user_to_follow=user.username) }}" method="post">
+                                {{ formFollow.hidden_tag() }}
+                                {{ formFollow.submit(value="Follow", class="bg-blue px-10 text-center mt-2 rounded cursor-pointer py-1 text-sm hover:bg-pinkish") }}
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="flex justify-center items-center w-5/6 mx-auto pt-1">
+                    <a href="#" type="button" @click="showUserFollow = true" class="text-sm mx-2 text-gray-700"><span class="font-bold">{{ user.followers.count() }}</span><br />followers</a>
+                    <a href="#" type="button" @click="showUserFollowing = true" class="text-sm mx-2 text-gray-700"><span class="font-bold">{{ user.followed.count() }}</span><br />following</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- others -->
+    <div class="mt-3 md:flex justify-between">
+        <div class="w-full md:mx-2 md:w-2/5" x-data="{ 'showWhoami': false, 'showSocialLinks': false }">
+            {% if user == current_user %}
+            <!-- start User > Edit - whoami -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showWhoami" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showWhoami }">
+                <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showWhoami" @click.away="showWhoami = false">
+                    <div class="flex justify-between items-center pb-3">
+                        <p class="text-2xl font-bold text-gray-500">Edit WHOAMI</p>
+                        <div class="cursor-pointer z-50" @click="showWhoami = false">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="">
+                        <form class="px-2" method="post" action="{{ url_for('users.update_Whoami', user=current_user.username) }}">
+                            {{ formUpWhoami.hidden_tag() }}
+                            <div class="flex flex-col">
+                                {{ formUpWhoami.whoami.label(class="pt-2 text-gray-500") }}
+                                {% if formUpWhoami.whoami.errors %}
+                                    {{ formUpWhoami.whoami(class="placeholder-gray-600 h-56 sm:h-48 text-sm text-gray-600 focus:text-gray-200 p-2 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none", placeholder="You can leave it blank but would've been better if put in something.", maxlength=50) }}
+                                    <div class="pt-1">
+                                        {% for error in formUpWhoami.whoami.errors %}
+                                        <span class="text-redish">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ formUpWhoami.whoami(class="placeholder-gray-600 h-56 sm:h-48 text-sm text-gray-600 focus:text-gray-200 p-2 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none", placeholder="You can leave it blank but would've been better if put in something.", maxlength=50) }}
+                                {% endif %}
+                            </div>
+                            <div class="pt-3">
+                                {{ formUpWhoami.update(class="w-full bg-darkish py-2 text-gray-300 rounded-lg hover:bg-blue focus:outline-none cursor-pointer") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end User > Edit - whoami -->
+            {% endif %}
+            {% if user == current_user %}
+            <!-- start User > Edit - social links -->
+            <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showSocialLinks" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': showSocialLinks }">
+                <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="showSocialLinks" @click.away="showSocialLinks = false">
+                    <div class="flex justify-between items-center pb-3">
+                        <p class="text-xl font-bold text-gray-500">Edit Your Social Links</p>
+                        <div class="cursor-pointer z-50" @click="showSocialLinks = false">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="">
+                        <form class="px-2" method="post" action="{{ url_for('users.update_SocialLinks', user=current_user.username) }}">
+                            {{ formUpSocialLinks.hidden_tag() }}
+                            <div class="flex flex-col">
+                                {{ formUpSocialLinks.fb.label(class="pt-2 text-gray-500") }}
+                                <div class="relative flex items-center w-full">
+                                    <i class="fab fa-facebook absolute left-0 text-xl text-gray-700 ml-3"></i>
+                                    {{ formUpSocialLinks.fb(class="placeholder-gray-600 text-sm text-gray-600 focus:text-gray-200 py-2 pl-10 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none w-full", placeholder="Enter your Facebook link") }}
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                {{ formUpSocialLinks.tw.label(class="pt-2 text-gray-500") }}
+                                <div class="relative flex items-center w-full">
+                                    <i class="fab fa-twitter absolute left-0 text-xl text-gray-700 ml-3"></i>
+                                    {{ formUpSocialLinks.tw(class="placeholder-gray-600 text-sm text-gray-600 focus:text-gray-200 py-2 pl-10 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none w-full", placeholder="Enter your Twitter link") }}
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                {{ formUpSocialLinks.ig.label(class="pt-2 text-gray-500") }}
+                                <div class="relative flex items-center w-full">
+                                    <i class="fab fa-instagram absolute left-0 text-xl text-gray-700 ml-3"></i>
+                                    {{ formUpSocialLinks.ig(class="placeholder-gray-600 text-sm text-gray-600 focus:text-gray-200 py-2 pl-10 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none w-full", placeholder="Enter your Instagram link") }}
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                {{ formUpSocialLinks.yt.label(class="pt-2 text-gray-500") }}
+                                <div class="relative flex items-center w-full">
+                                    <i class="fab fa-youtube absolute left-0 text-xl text-gray-700 ml-3"></i>
+                                    {{ formUpSocialLinks.yt(class="placeholder-gray-600 text-sm text-gray-600 focus:text-gray-200 py-2 pl-10 border-2 border-gray-800 rounded-lg bg-transparent hover:border-darkish focus:border-darkish focus:outline-none w-full", placeholder="Enter your Youtube link") }}
+                                </div>
+                            </div>
+                            <div class="pt-3">
+                                {{ formUpSocialLinks.update(class="w-full bg-darkish py-2 text-gray-300 rounded-lg hover:bg-blue focus:outline-none cursor-pointer") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end User > Edit - social links -->
+            {% endif %}
+            <!-- profile > about -->
+            <div class="w-full pt-3 pb-4 rounded-lg px-5 bg-darker">
+                <div class="flex justify-between">
+                    <h3 class="text-gray-700 font-bold tracking-wider uppercase">Who Am I?</h3>
+                    {% if user == current_user %}
+                        <a href="#" type="button" @click="showWhoami = true" class="cursor-pointer text-xs underline text-gray-700 hover:text-gray-600">Edit</a>
+                    {% endif %}
+                </div>
+                {% if user.whoami %}
+                    <p class="text-gray-600 text-center">{{ user.whoami }}</p>
+                {% else %}
+                    <p class="text-gray-600 text-center text-sm">Nothing to show here.</p>
+                {% endif %}
+            </div>
+            <!-- profile > social links -->
+            <div class="w-full mt-2 pt-3 pb-4 rounded-lg px-5 bg-darker">
+                <div class="flex justify-between">
+                    <h3 class="text-gray-700 font-bold tracking-wider uppercase">Social</h3>
+                    {% if user == current_user %}
+                        <a href="#" type="button" @click="showSocialLinks = true" class="text-xs underline text-gray-700 hover:text-gray-600">Edit</a>
+                    {% endif %}
+                </div>
+                <ul class="lg:grid grid-cols-2 gap-2 mt-2 text-center">
+                    {% if user.social_fb %}
+                        <li><a href="{{ user.social_fb }}" class="text-gray-600 hover:text-gray-500 tracking-wide"><i class="fab fa-facebook mr-1"></i>facebook</a></li>
+                    {% endif %}
+                    {% if user.social_tw %}
+                        <li><a href="{{ user.social_tw }}" class="text-gray-600 hover:text-gray-500 tracking-wide"><i class="fab fa-twitter mr-1"></i>twitter</a></li>
+                    {% endif %}
+                    {% if user.social_ig %}
+                        <li><a href="{{ user.social_ig }}" class="text-gray-600 hover:text-gray-500 tracking-wide"><i class="fab fa-instagram mr-1"></i>instagram</a></li>
+                    {% endif %}
+                    {% if user.social_yt %}
+                        <li><a href="{{ user.social_yt }}" class="text-gray-600 hover:text-gray-500 tracking-wide"><i class="fab fa-youtube mr-1"></i>youtube</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- stories count -->
+            <a type="button" href="{{ url_for('users.user_stories', user=user.username) }}" class="w-full mt-2 pt-3 pb-4 rounded-lg px-5 bg-darker text-center cursor-pointer">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold tracking-wide text-gray-600">{{ my_stories|length }}</h2>
+                    <h3 class="text-gray-700 tracking-wide text-sm uppercase">Stories</h3>
+                </div>
+            </a>
+        </div>
+        <!-- profile > posts -->
+        <div class="w-full md:mx-2 md:w-3/5 mt-3 md:mt-0">
+            <h3 class="text-gray-600 tracking-wide mb-2">Posts</h3>
+            <div class="">
+                {% for my_story in my_stories %}
+                <!-- post -->
+                <div class="bg-darker p-3 rounded-lg mb-2 relative" x-data="{ open: false }">
+                    <!-- post info -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <div class="relative h-10 w-10">
+                                <img src="{{ url_for('static', filename='profile_pics/' + my_story.author.acc_image) }}" alt="" class="absolute w-full h-full object-cover rounded-full z-0">
+                            </div>
+                            <div class="user-info flex flex-col">
+                                <div class="flex items-center">
+                                    {% if user == current_user %}
+                                        <h4 class="mx-2 text-blue tracking-wide">{{ my_story.author.username }} (You)</h4>
+                                    {% else %}
+                                        <h4 class="mx-2 text-blue tracking-wide">{{ my_story.author.username }}</h4>
+                                    {% endif %}
+                                    {% if my_story.emotion == "happy" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Happy</span> 😀</p>
+                                    {% elif my_story.emotion == "blessed" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Blessed</span> 😇</p>
+                                    {% elif my_story.emotion == "loved" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Loved</span> 😍</p>
+                                    {% elif my_story.emotion == "lovely" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Lovely</span> 😊</p>
+                                    {% elif my_story.emotion == "sad" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sad</span> 🙁</p>
+                                    {% elif my_story.emotion == "surprised" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Surprised</span> 😱</p>
+                                    {% elif my_story.emotion == "angry" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Angry</span> 😡</p>
+                                    {% elif my_story.emotion == "excited" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Excited</span> 😁</p>
+                                    {% elif my_story.emotion == "embarassed" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Embarrased</span> 😳</p>
+                                    {% elif my_story.emotion == "thankful" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Thankful</span> 🤗</p>
+                                    {% elif my_story.emotion == "in_love" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">In Love</span> 🥰</p>
+                                    {% elif my_story.emotion == "crazy" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Crazy</span> 😆</p>
+                                    {% elif my_story.emotion == "sick" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sick</span> 🤒</p>
+                                    {% elif my_story.emotion == "tired" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Tired</span> 😓</p>
+                                    {% elif my_story.emotion == "sleepy" %}
+                                        <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sleepy</span> 🥱</p>
+                                    {% endif %}
+                                </div>
+                                <p class="ml-4 text-gray-700 post-date text-sx">on {{ my_story.date_posted.strftime("%B %d, %Y") }}</p>
+                            </div>
+                        </div>
+                        <p class="pt-1 text-gray-700 post-date text-xs hidden lg:block">{{ my_story.date_posted.strftime("%I:%M %p") }}</p>
+                    </div>
+                    <!-- post main -->
+                    <div class="flex justify-center items-center feel-{{ my_story.emotion }} mt-2">
+                        <div class="pt-5 pb-6 px-3 md:px-6 text-center">
+                            <h2 class="font-bold tracking-wide text-2xl md:text-2xl lg:text-3xl sm:text-3xl">{{ my_story.content }}</h2>
+                        </div>
+                    </div>
+                    <p class="pt-1 text-gray-700 post-date text-xs block lg:hidden">{{ my_story.date_posted.strftime("%I:%M %p") }}</p>
+                    {% if user == current_user %}
+                    <!-- button post / edit-delete -->
+                    <button type="button" class="absolute top-0 right-0 mr-2 text-gray-700 focus:outline-none" @click="open = !open"><i class="fas fa-caret-down"></i></button>
+                    <div class="top-0 right-0 rounded absolute bg-dark mt-8 mr-2" x-show="open" @click.away="open = false">
+                        <ul class="shadow px-2 w-20 py-1 text-white">
+                            <li><a href="{{ url_for('stories.user_post', story_id=my_story.id, user=current_user.username) }}" class="py-1 px-1 text-sm block w-full text-center text-blue hover:bg-blue hover:text-white">Modify</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <!-- more stories -->
+                {% if not my_stories|length == 0 %}
+                    <a href="{{ url_for('stories.all_user_stories', user=user.username) }}" type="button" class="border-2 border-darkish rounded-lg text-center w-full py-1 bg-darkish text-sm hover:bg-gray-600 hover:border-gray-600">More Stories</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock dash_content %}

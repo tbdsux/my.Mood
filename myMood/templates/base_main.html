@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }} | Welcome</title>
+    <!-- favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- main css file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/build.css') }}">
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <!-- alpinejs -->
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <!-- fontawesome -->
+    <script defer src="https://use.fontawesome.com/releases/v5.13.0/js/all.js"></script>
+</head>
+
+<body class="antialiased">
+    <!-- navigation menu -->
+    <div class="w-full fixed top-0 z-50">
+        <nav class="py-4 sm:py-0 px-6 md:px-10 lg:px-16 mx-auto sm:flex justify-between items-center bg-white" x-data="{ open: false }">
+            <div class="flex flex-row justify-between items-center text-xl font-sans font-bold">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="my.Mood" class="h-10 w-10">
+                    <h1 class="ml-2 tracking-wide text-pinkish">my.MOOD</h1>
+                </div>
+                <div class="sm:hidden">
+                    <button @click="open=!open" class="focus:outline-none"
+                        @keydown.escape="open = false"
+                        >
+                        <i x-show="!open" class="fas fa-bars"></i>
+                        <i x-show="open" class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ml-4 sm:flex"
+                    :class="{'block':open, 'hidden':!open}"
+                    x-show="true"
+                    @click.away = "open=false">
+                <ul class="block text-center sm:flex items-center justify-between">
+                    <li class="block my-3 px-3 lg:px-5"><a href="{{ url_for('main.home') }}" class="hover:text-pinkish focus:outline-alignContent">Home</a></li>
+                    <li class="block my-3 px-3 lg:px-5"><a href="{{ url_for('main.discover') }}" class="hover:text-pinkish focus:outline-alignContent">Discover</a></li>
+                    <li class="block my-3 px-3 lg:px-5"><a href="{{ url_for('main.about') }}" class="hover:text-pinkish focus:outline-alignContent">About Us</a></li>
+                    <li class="block my-6 px-3 lg:px-5"><a href="{{ url_for('users.user_login') }}" class="text-white bg-pinkish rounded-full px-6 py-2 text-sm hover:bg-blueish focus:outline-alignContent"><i class="fas fa-user mr-2"></i>Log In</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <!-- index.html (not logged in) -->
+    {% block content %}
+
+    {% endblock content %}
+
+    <!-- footer -->
+    <footer class="bg-white">
+        <div class="w-11/12 mx-auto py-3">
+            <ul class="flex justify-center">
+                <li class="px-3"><a href="#" class="text-xs text-gray-600 hover:text-pinkish">Terms</a></li>
+                <li class="px-3"><a href="#" class="text-xs text-gray-600 hover:text-pinkish">Privacy Policy</a></li>
+                <li class="px-3"><a href="#" class="text-xs text-gray-600 hover:text-pinkish">FAQs</a></li>
+            </ul>
+            <p class="text-sm text-center mt-2">Copyrights &copy; my.MOOD | 2020</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+{% extends "dashboard.html" %}
+
+{% block dash_content %}
+<!-- edit post -->
+<div class="w-5/6 mt-8 mx-auto">
+    <p class="uppercase text-gray-600 mb-2">Edit Story:</p>
+    <div class="w-full" id="new-post">
+        <form class="" action="{{ url_for('stories.update_post', user=story.author.username, story_id=story.id) }}" method="post">
+            {{ form.hidden_tag() }}
+            <div class="flex flex-col mb-1">
+                {% if form.content.errors %}
+                    {{ form.content(class="h-16 sm:h-20 md:h-16 lg:h-20 w-full py-2 px-3 bg-darkish text-sm md:text-base border-2 border-redish rounded-md focus:outline-none focus:border-blue", placeholder="How do you feel right now?", maxlength=110) }}
+                    <div class="pt-1">
+                        {% for error in form.content.errors %}
+                        <span class="text-redish">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.content(class="h-16 sm:h-20 md:h-16 lg:h-20 w-full py-2 px-3 bg-darkish text-sm md:text-base border-2 border-transparent rounded-md focus:outline-none focus:border-blue", placeholder="How do you feel right now?") }}
+                {% endif %}
+            </div>
+            <div class="post-form flex flex-col sm:flex-row sm:justify-between">
+                <div class="flex justify-between sm:justify-center">
+                    {{ form.emotion(class="cursor-pointer rounded-md px-2 py-1 text-sm bg-transparent border-2 border-darkish focus:outline-none w-32 sm:w-48 focus:outline-none focus:border-blue") }}
+                    {{ form.state(class="cursor-pointer rounded-md ml-2 px-2 py-1 text-sm bg-transparent border-2 border-darkish focus:outline-none focus:border-blue") }}
+                </div>
+                {{ form.post(class="mt-3 sm:mt-0 px-6 py-1 bg-darkish text-white hover:bg-blue focus:outline-none cursor-pointer", value="Update") }}
+            </div>
+        </form>
+    </div>
+    <hr class="border-darkish my-4">
+</div>
+
+<!-- User > Post (Specific) -->
+<div class="w-5/6 mt-8 mx-auto relative" x-data="{ deletePost: false }">
+    <p class="lowercase text-gray-600 mb-2">Output:</p>
+    <!-- post -->
+    <div class="bg-darker p-3 rounded-lg mb-2 relative">
+        <!-- post info -->
+        <div class="flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="relative h-10 w-10">
+                    <img src="{{ url_for('static', filename='profile_pics/' + story.author.acc_image) }}" alt="" class="absolute w-full h-full object-cover rounded-full z-0">
+                </div>
+                <div class="user-info flex flex-col">
+                    <div class="flex items-center">
+                        <h4 class="mx-2 text-blue tracking-wide">{{ story.author.username }} (You)</h4>
+                        {% if story.emotion == "happy" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Happy</span> 😀</p>
+                        {% elif story.emotion == "blessed" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Blessed</span> 😇</p>
+                        {% elif story.emotion == "loved" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Loved</span> 😍</p>
+                        {% elif story.emotion == "lovely" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Lovely</span> 😊</p>
+                        {% elif story.emotion == "sad" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sad</span> 🙁</p>
+                        {% elif story.emotion == "surprised" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Surprised</span> 😱</p>
+                        {% elif story.emotion == "angry" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Angry</span> 😡</p>
+                        {% elif story.emotion == "excited" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Excited</span> 😁</p>
+                        {% elif story.emotion == "embarassed" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Embarrased</span> 😳</p>
+                        {% elif story.emotion == "thankful" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Thankful</span> 🤗</p>
+                        {% elif story.emotion == "in_love" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">In Love</span> 🥰</p>
+                        {% elif story.emotion == "crazy" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Crazy</span> 😆</p>
+                        {% elif story.emotion == "sick" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sick</span> 🤒</p>
+                        {% elif story.emotion == "tired" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Tired</span> 😓</p>
+                        {% elif story.emotion == "sleepy" %}
+                            <p class="text-sm mt-1 text-gray-600 emotion flex">is feeling <span class="hidden sm:block px-1">Sleepy</span> 🥱</p>
+                        {% endif %}
+                    </div>
+                    <p class="ml-4 text-gray-700 post-date text-sx">on {{ story.date_posted.strftime("%B %d, %Y") }}</p>
+                </div>
+            </div>
+            <p class="pt-1 text-gray-700 post-date text-xs hidden lg:block">{{ story.date_posted.strftime("%I:%M %p") }}</p>
+        </div>
+        <!-- post main -->
+        <div class="flex justify-center items-center feel-{{ story.emotion }} mt-2">
+            <div class="pt-5 pb-6 px-3 md:px-6 text-center">
+                <h2 class="font-bold tracking-wide text-2xl md:text-2xl lg:text-3xl sm:text-3xl">{{ story.content }}</h2>
+            </div>
+        </div>
+        <!-- edit / delete buttons (for specific posts) -->
+        <div class="py-2">
+            <a @click="deletePost = true" type="button" class="mx-2 text-redish py-1 px-6 rounded text-sm hover:bg-dark cursor-pointer">Delete</a>
+        </div>
+    </div>
+
+
+    <!-- start UPDATE BACKGROUND IMAGE -->
+    <div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="deletePost" :class="{ 'h-screen fixed inset-0 z-10 flex items-center justify-center': deletePost }">
+       <div class="md:ml-1/10 lg:ml-1/12 absolute bg-darker w-11/12 md:max-w-md mx-auto rounded shadow-lg py-4 text-left px-6" x-show="deletePost" @click.away="deletePost = false">
+            <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-bold text-gray-500">Delete Story?</p>
+                <div class="cursor-pointer z-50" @click="deletePost = false">
+                    <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                        <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="pt-1 text-center">
+                <p class="text-gray-600 px-2 pb-4">Are you sure you want to delete your story permanently?</p>
+                <form class="px-2" method="post" action="{{ url_for('stories.delete_post', user=story.author.username, story_id=story.id) }}">
+                    <input type="submit" name="" value="Confirm" class="mx-2 bg-redish text-gray-300 py-1 px-6 rounded hover:bg-dark hover:text-redish cursor-pointer">
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- end UPDATE BACKGROUND IMAGE -->
+</div>
+{% endblock dash_content %}
