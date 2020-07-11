@@ -11,6 +11,21 @@ from sqlalchemy.sql.expression import func
 from flask_login import login_user, current_user, logout_user, login_required
 from myMood import db, bcrypt, cache
 from myMood.models import User, Post
+from myMood.stories.query import (
+    query_all_stories,
+    query_all_public_stories,
+    query_public_stories,
+    query_def_stories,
+    query_all_stories,
+    query_user_stories,
+    query_user_story,
+    query_user_public_stories,
+)
+from myMood.users.query import (
+    query_user_profile,
+    query_search_user,
+    query_search_stories,
+)
 from myMood.users.forms import (
     RegisterForm,
     LoginForm,
@@ -33,6 +48,10 @@ from myMood.users.utils import save_bg_image, save_profile_pic, send_reset_email
 import os
 
 users = Blueprint("users", __name__)
+
+
+def is_post():
+    return request.method == "POST"
 
 
 @users.route("/user/login", methods=["GET", "POST"])
@@ -105,13 +124,13 @@ def user_logout():
 
 # Dashboard Routes
 @users.route("/", methods=["GET", "POST"])
-@cache.cached(key_prefix="dashboard")
+@cache.cached(unless=is_post)
 def dashboard():
     if not current_user.is_authenticated:
         return redirect(url_for("main.home"))
-    s = current_user
+    # s = current_user
     # page = request.args.get("stories", 1, type=int)
-    stories = s.followed_posts().limit(10).all()
+    stories = query_def_stories()
     # stories = Post.query.filter_by(author=current_user).order_by(
     #     Post.date_posted.desc()
     # )
@@ -130,7 +149,8 @@ def dashboard():
             )
             db.session.add(story)
             db.session.commit()
-            cache.delete("user_stories")
+            cache.delete_memoized(query_def_stories)
+            cache.delete("view//")
             return redirect(url_for("users.dashboard"))
     return render_template(
         "dashboard/index.html", form=form, dashboard_title="Home", stories=stories,
@@ -183,35 +203,21 @@ def dash_profile(user):
         formUpSocialLinks.ig.data = current_user.social_ig
         formUpSocialLinks.yt.data = current_user.social_yt
 
-    username = User.query.filter_by(username=user).first_or_404()
+    user = query_user_profile()
     # stories = Post.query.filter_by(author=username).order_by(Post.date_posted.desc())
-    if current_user == username:
-        stories = (
-            Post.query.filter_by(author=username)
-            .order_by(Post.date_posted.desc())
-            .limit(7)
-            .all()
-        )
+    if current_user == user:
+        stories = query_user_stories(user)
     else:
-        if current_user.is_following(username):
-            stories = (
-                Post.query.filter_by(author=username)
-                .order_by(Post.date_posted.desc())
-                .limit(7)
-                .all()
-            )
+        if current_user.is_following(user):
+            stories = query_user_stories(user)
         else:
-            stories = (
-                Post.query.filter_by(author=username, state="public")
-                .order_by(Post.date_posted.desc())
-                .limit(7)
-                .all()
-            )
+            stories = query_user_public_stories()
+
     return render_template(
         "dashboard/user_profile.html",
         dashboard_title=user + " - Profile",
         my_stories=stories,
-        user=username,
+        user=user,
         formUpProfile=formUpProfile,
         formUpProfilePic=formUpProfilePic,
         formUpBgImage=formUpBgImage,
@@ -243,6 +249,7 @@ def update_BgImage(user):
                 pic_file = save_bg_image(formUpBgImage.image_background.data)
                 current_user.acc_image_bg = pic_file
                 db.session.commit()
+                cache.delete_memoized(query_user_profile, user)
                 cache.delete("dash_profile")
                 return redirect(
                     url_for("users.dash_profile", user=current_user.username)
@@ -269,6 +276,7 @@ def update_ProfilePic(user):
                 pic_file = save_profile_pic(formUpProfilePic.profile_pic.data)
                 current_user.acc_image = pic_file
                 db.session.commit()
+                cache.delete_memoized(query_user_profile, user)
                 cache.delete("dash_profile")
                 return redirect(
                     url_for("users.dash_profile", user=current_user.username)
@@ -284,6 +292,7 @@ def update_Profile(user):
             current_user.username = formUpProfile.username.data
             current_user.random_say = formUpProfile.random_say.data
             db.session.commit()
+            cache.delete_memoized(query_user_profile, user)
             cache.delete("dash_profile")
             return redirect(url_for("users.dash_profile", user=current_user.username))
     return redirect(url_for("users.dash_profile", user=current_user.username))
@@ -297,6 +306,7 @@ def update_Whoami(user):
         if formUpWhoami.validate_on_submit():
             current_user.whoami = formUpWhoami.whoami.data
             db.session.commit()
+            cache.delete_memoized(query_user_profile, user)
             cache.delete("dash_profile")
             return redirect(url_for("users.dash_profile", user=current_user.username))
 
@@ -312,6 +322,7 @@ def update_SocialLinks(user):
             current_user.social_ig = formUpSocialLinks.ig.data
             current_user.social_yt = formUpSocialLinks.yt.data
             db.session.commit()
+            cache.delete_memoized(query_user_profile, user)
             cache.delete("dash_profile")
             return redirect(url_for("users.dash_profile", user=current_user.username))
 
@@ -350,12 +361,13 @@ def dash_acc_settings(emailErr=None, passErr=None):
 
 # Discover
 @users.route("/discover", methods=["GET", "POST"])
-@cache.cached(key_prefix="dash_discover")
+@cache.cached(unless=is_post, key_prefix="dash_discover")
 def dash_discover():
     formFollow = FollowForm()
     formSearch = SearchForm()
 
     if formSearch.validate_on_submit():
+        cache.delete("dash_discover")
         return redirect(url_for("users.search", query=formSearch.search_field.data))
 
     users = (
@@ -365,12 +377,7 @@ def dash_discover():
         .all()
     )
 
-    stories = (
-        Post.query.filter_by(state="public")
-        .order_by(Post.date_posted.desc())
-        .limit(7)
-        .all()
-    )
+    stories = query_public_stories()
 
     return render_template(
         "dashboard/discover.html",
@@ -385,6 +392,7 @@ def dash_discover():
 # Search
 @users.route("/search", methods=["GET", "POST"])
 @login_required
+@cache.cached(unless=is_post, key_prefix="dash_search")
 def search():
     formFollow = FollowForm()
     formSearch = SearchForm()
@@ -392,15 +400,15 @@ def search():
     q = request.args.get("query")
 
     if formSearch.validate_on_submit():
+        cache.delete("dash_search")
         return redirect(url_for("users.search", query=formSearch.search_field.data))
 
     # get users
-    users = User.query.filter(
-        User.username.ilike("%" + q + "%"), current_user.username != q
-    ).all()
+    users = query_search_user(q)
     # get stories
-    s = current_user
-    stories = s.search_posts(q).all()
+    # s = current_user
+    # stories = s.search_posts(q).all()
+    stories = query_search_stories(q)
 
     # pass the search query to the inut value
     formSearch.search_field.data = q
@@ -418,13 +426,10 @@ def search():
 
 # get posts of a user
 @users.route("/u/<user>/stories")
-@cache.cached(key_prefix="user_stories")
 def user_stories(user):
     # page = request.args.get("p", 1, type=int)
     u = User.query.filter_by(username=user).first_or_404()
-    stories = (
-        Post.query.filter_by(author=u).order_by(Post.date_posted.desc()).limit(7).all()
-    )
+    stories = query_user_stories(u)
 
     if u == current_user:
         title = "My Stories"
@@ -438,7 +443,7 @@ def user_stories(user):
 
 # Reset Password > Send a Request Token
 @users.route("/reset/password", methods=["GET", "POST"])
-@cache.cached(key_prefix="reset_password_page")
+@cache.cached(unless=is_post)
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for("main.home"))
@@ -459,6 +464,7 @@ def reset_request():
 
 # Reset Password > Enter a new password
 @users.route("/reset/password/new", methods=["GET", "POST"])
+@cache.cached(unless=is_post)
 def new_password():
     token = request.args.get("token")
     if current_user.is_authenticated:

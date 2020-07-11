@@ -3,15 +3,26 @@ from flask_login import current_user, login_required
 from myMood import db, cache
 from myMood.models import User, Post
 from myMood.stories.forms import NewStoryForm
+from myMood.stories.query import (
+    query_all_public_stories,
+    query_all_stories,
+    query_def_stories,
+    query_user_stories,
+    query_user_story,
+)
 
 stories = Blueprint("stories", __name__)
 
 
+def is_post():
+    return request.method == "POST"
+
+
 @stories.route("/u/<user>/stories/<int:story_id>", methods=["GET"])
-@cache.cached(key_prefix="story_user")
+@cache.memoize()
 def user_post(user, story_id):
     form = NewStoryForm()
-    story = Post.query.get_or_404(story_id)
+    story = query_user_story(story_id)
     if request.method == "GET":
         form.content.data = story.content
         form.emotion.data = story.emotion
@@ -24,7 +35,7 @@ def user_post(user, story_id):
 # update post
 @stories.route("/u/<user>/stories/<int:story_id>/update", methods=["GET", "POST"])
 def update_post(user, story_id):
-    story = Post.query.get_or_404(story_id)
+    story = query_user_story(story_id)
     if story.author != current_user:
         return redirect(url_for("users.dash_profile", user=story.author.username))
     form = NewStoryForm()
@@ -34,7 +45,8 @@ def update_post(user, story_id):
             story.emotion = form.emotion.data
             story.state = form.state.data
             db.session.commit()
-            cache.delete("story_user")
+            cache.delete_memoized(query_user_story, story_id)
+            cache.delete_memoized(user_post)
             return redirect(
                 url_for(
                     "stories.user_post", user=current_user.username, story_id=story.id
@@ -45,13 +57,14 @@ def update_post(user, story_id):
 # delete post
 @stories.route("/u/<user>/stories/<int:story_id>/delete", methods=["GET", "POST"])
 def delete_post(user, story_id):
-    story = Post.query.get_or_404(story_id)
+    story = query_user_story(story_id)
     if story.author != current_user:
         return redirect(url_for("users.dash_profile", user=story.author.username))
     if request.method == "POST":
         db.session.delete(story)
         db.session.commit()
-        cache.delete("story_user")
+        cache.delete_memoized(query_user_story, story_id)
+        cache.delete_memoized(user_post)
         return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
@@ -59,10 +72,8 @@ def delete_post(user, story_id):
 
 # all stories with followed ones
 @stories.route("/stories/all")
-@cache.cached(key_prefix="all_stories")
 def all_stories():
-    s = current_user
-    stories = s.followed_posts().all()
+    stories = query_all_stories()
 
     return render_template(
         "dashboard/all_stories.html", dashboard_title="Stories", stories=stories
@@ -71,10 +82,9 @@ def all_stories():
 
 # stories of user only
 @stories.route("/u/<user>/stories/all")
-@cache.cached(key_prefix="all_user_stories")
 def all_user_stories(user):
     u = User.query.filter_by(username=user).first_or_404()
-    stories = Post.query.filter_by(author=u).order_by(Post.date_posted.desc()).all()
+    stories = query_user_stories(u)
 
     if u == current_user:
         title = "My Stories"
@@ -87,14 +97,9 @@ def all_user_stories(user):
 
 
 # public stories only
-
-
 @stories.route("/discover/stories/all")
-@cache.cached(key_prefix="all_public_stories")
 def all_public_stories():
-    stories = (
-        Post.query.filter_by(state="public").order_by(Post.date_posted.desc()).all()
-    )
+    stories = query_all_public_stories()
 
     return render_template(
         "dashboard/all_stories.html", dashboard_title="Public Stories", stories=stories
