@@ -36,7 +36,6 @@ users = Blueprint("users", __name__)
 
 
 @users.route("/user/login", methods=["GET", "POST"])
-@cache.cached(key_prefix="user_login")
 def user_login():
     # bypass if user is authenticated
     if current_user.is_authenticated:
@@ -64,7 +63,6 @@ def user_login():
 
 
 @users.route("/user/register", methods=["GET", "POST"])
-@cache.cached(key_prefix="user_register")
 def user_register():
     # bypass if user is authenticated
     if current_user.is_authenticated:
