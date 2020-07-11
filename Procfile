@@ -1,1 +1,1 @@
-web: gunicorn myMood:app
+web: gunicorn myMood:create_app()
