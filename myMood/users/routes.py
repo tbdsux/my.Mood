@@ -30,7 +30,6 @@ from myMood.users.forms_profile import (
     UpdatePassword,
 )
 from myMood.users.utils import save_bg_image, save_profile_pic, send_reset_email
-import flask_whooshalchemy
 import os
 
 users = Blueprint("users", __name__)
