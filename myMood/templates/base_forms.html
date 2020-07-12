@@ -20,10 +20,12 @@
     <div class="{{ screen_height }} w-full hero-container flex items-center justify-center" id="formContainer">
         <div class="w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 py-10">
             <!-- main form -->
+            {% cache None %}
             <div class="flex items-center justify-center mb-2">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="my.Mood" class="h-12 w-12 rounded-full">
                 <h1 class="ml-2 tracking-wide text-pinkish text-3xl font-sans font-bold text-center tracking-wider">my.MOOD</h1>
             </div>
+            {% endcache %}
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -42,6 +44,7 @@
     </div>
 
     <!-- for login and forgot_password forms (better responsiveness) -->
+    {% cache None %}
     <script type="text/javascript">
         function ScrollBAR(page){
             var deviceHeight = screen.height;
@@ -59,5 +62,6 @@
             }
         }
     </script>
+    {% endcache %}
 </body>
 </html>

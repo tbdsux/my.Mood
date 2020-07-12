@@ -18,9 +18,7 @@ from myMood.stories.query import (
     query_public_stories,
     query_def_stories,
     query_all_stories,
-    query_user_stories,
     query_user_story,
-    query_user_public_stories,
 )
 from myMood.users.query import (
     query_user_profile,
@@ -127,7 +125,6 @@ def user_logout():
 
 # Dashboard Routes
 @users.route("/", methods=["GET", "POST"])
-@cache.cached(unless=is_post)
 def dashboard():
     if not current_user.is_authenticated:
         return redirect(url_for("main.home"))
@@ -152,8 +149,9 @@ def dashboard():
             )
             db.session.add(story)
             db.session.commit()
+            if request.form["state"] == "public":
+                cache.delete_memoized(query_public_stories, query_all_public_stories)
             cache.delete_memoized(query_def_stories)
-            cache.delete("view//")
             return redirect(url_for("users.dashboard"))
     return render_template(
         "dashboard/index.html", form=form, dashboard_title="Home", stories=stories,
@@ -169,6 +167,7 @@ def follow_user(user_to_follow):
             target_user = User.query.filter_by(username=user_to_follow).first()
             current_user.follow(target_user)
             db.session.commit()
+            cache.delete_memoized(query_user_profile, user_to_follow)
             cache.delete("user_stories")
             return redirect(url_for("users.dash_profile", user=user_to_follow))
 
@@ -182,6 +181,7 @@ def unfollow_user(user_to_unfollow):
             target_user = User.query.filter_by(username=user_to_unfollow).first()
             current_user.unfollow(target_user)
             db.session.commit()
+            cache.delete_memoized(query_user_profile, user_to_follow)
             cache.delete("user_stories")
             return redirect(url_for("users.dash_profile", user=user_to_unfollow))
 
@@ -206,21 +206,36 @@ def dash_profile(user):
         formUpSocialLinks.ig.data = current_user.social_ig
         formUpSocialLinks.yt.data = current_user.social_yt
 
-    user = query_user_profile()
+    username = query_user_profile(user)
     # stories = Post.query.filter_by(author=username).order_by(Post.date_posted.desc())
-    if current_user == user:
-        stories = query_user_stories(user)
+    if current_user == username:
+        stories = (
+            Post.query.filter_by(author=username)
+            .order_by(Post.date_posted.desc())
+            .limit(7)
+            .all()
+        )
     else:
-        if current_user.is_following(user):
-            stories = query_user_stories(user)
+        if current_user.is_following(username):
+            stories = (
+                Post.query.filter_by(author=username)
+                .order_by(Post.date_posted.desc())
+                .limit(7)
+                .all()
+            )
         else:
-            stories = query_user_public_stories()
+            stories = (
+                Post.query.filter_by(author=username, state="public")
+                .order_by(Post.date_posted.desc())
+                .limit(7)
+                .all()
+            )
 
     return render_template(
         "dashboard/user_profile.html",
         dashboard_title=user + " - Profile",
         my_stories=stories,
-        user=user,
+        user=username,
         formUpProfile=formUpProfile,
         formUpProfilePic=formUpProfilePic,
         formUpBgImage=formUpBgImage,
@@ -364,13 +379,11 @@ def dash_acc_settings(emailErr=None, passErr=None):
 
 # Discover
 @users.route("/discover", methods=["GET", "POST"])
-@cache.cached(unless=is_post, key_prefix="dash_discover")
 def dash_discover():
     formFollow = FollowForm()
     formSearch = SearchForm()
 
     if formSearch.validate_on_submit():
-        cache.delete("dash_discover")
         return redirect(url_for("users.search", query=formSearch.search_field.data))
 
     users = (
@@ -395,7 +408,6 @@ def dash_discover():
 # Search
 @users.route("/search", methods=["GET", "POST"])
 @login_required
-@cache.cached(unless=is_post, key_prefix="dash_search")
 def search():
     formFollow = FollowForm()
     formSearch = SearchForm()
@@ -403,7 +415,6 @@ def search():
     q = request.args.get("query")
 
     if formSearch.validate_on_submit():
-        cache.delete("dash_search")
         return redirect(url_for("users.search", query=formSearch.search_field.data))
 
     # get users
@@ -429,10 +440,13 @@ def search():
 
 # get posts of a user
 @users.route("/u/<user>/stories")
+@cache.cached(key_prefix="user_stories")
 def user_stories(user):
     # page = request.args.get("p", 1, type=int)
     u = User.query.filter_by(username=user).first_or_404()
-    stories = query_user_stories(u)
+    stories = (
+        Post.query.filter_by(author=u).order_by(Post.date_posted.desc()).limit(7).all()
+    )
 
     if u == current_user:
         title = "My Stories"
@@ -446,7 +460,6 @@ def user_stories(user):
 
 # Reset Password > Send a Request Token
 @users.route("/reset/password", methods=["GET", "POST"])
-@cache.cached(unless=is_post)
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for("main.home"))
@@ -467,7 +480,6 @@ def reset_request():
 
 # Reset Password > Enter a new password
 @users.route("/reset/password/new", methods=["GET", "POST"])
-@cache.cached(unless=is_post)
 def new_password():
     token = request.args.get("token")
     if current_user.is_authenticated:

@@ -12,11 +12,11 @@ def query_user_profile(user):
 @cache.memoize()
 def query_search_user(q_user):
     return User.query.filter(
-        User.username.ilike("%" + q_user + "%"), current_user.username != q
+        User.username.ilike("%" + q_user + "%"), current_user.username != q_user
     ).all()
 
 
 @cache.memoize()
 def query_search_stories(q_story):
     s = current_user
-    return s.search_posts(q).all()
+    return s.search_posts(q_story).all()

@@ -1,6 +1,7 @@
 from flask import render_template, request, Blueprint, flash, url_for, redirect
 from myMood import db, bcrypt, cache
 from myMood.models import User, Post
+from flask_login import current_user
 from myMood.users.forms import RegisterForm
 from sqlalchemy.sql.expression import func
 
@@ -12,7 +13,6 @@ def is_post():
 
 
 @main.route("/home", methods=["GET", "POST"])
-@cache.cached(unless=is_post)
 def home():
     form = RegisterForm()
 
@@ -42,13 +42,11 @@ def home():
 
 
 @main.route("/about")
-@cache.cached()
 def about():
     return render_template("main/about.html", title="About")
 
 
 @main.route("/discover/g")
-@cache.cached()
 def discover():
     users = User.query.order_by(func.random()).limit(6).all()
     stories = (

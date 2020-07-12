@@ -7,7 +7,7 @@ from myMood.stories.query import (
     query_all_public_stories,
     query_all_stories,
     query_def_stories,
-    query_user_stories,
+    query_all_user_stories,
     query_user_story,
 )
 
@@ -84,7 +84,7 @@ def all_stories():
 @stories.route("/u/<user>/stories/all")
 def all_user_stories(user):
     u = User.query.filter_by(username=user).first_or_404()
-    stories = query_user_stories(u)
+    stories = query_all_user_stories(u)
 
     if u == current_user:
         title = "My Stories"

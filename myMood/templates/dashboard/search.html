@@ -19,7 +19,7 @@
     <div class="py-3">
         <h3 class="text-gray-500">Users:</h3>
         <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 overflow-hidden">
-            {% for user in users %}
+            {% for user in users if user != current_user %}
             <!-- user -->
             <div class="bg-darkish rounded-md">
                 <div class="relative h-40 w-full">

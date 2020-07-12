@@ -38,12 +38,14 @@
                     </div>
 
                     <hr class="m-6">
-
+                    {% cache None %}
                     <div class="text-center mb-3 mx-4 lg:mx-5 xl:mx-8">
                         <a href="{{ url_for('users.dashboard') }}" type="button" class="text-center px-3 py-1 border-2 border-blue rounded-lg text-blue text-sm sm:text-base hover:bg-blue hover:text-white flex items-center"><i class="fas fa-book-open mr-1 lg:mr-2"></i>New Story</a>
                     </div>
+                    {% endcache %}
 
                     <nav class="text-left ml-4">
+                        {% cache None %}
                         <ul class="block pb-3">
                             <li class="block my-3 px-2 lg:px-5"><a type="button" href="{{ url_for('users.dashboard') }}" class="hover:text-pinkish text-lg uppercae tracking-wide"><i class="fas fa-book mr-2"></i>Stories</a></li>
                             <li class="block my-3 px-2 lg:px-5"><a type="button" href="{{ url_for('users.dash_discover') }}" class="hover:text-pinkish text-lg uppercae tracking-wide"><i class="fas fa-globe mr-2"></i>Discover</a></li>
@@ -55,8 +57,10 @@
                             <li class="block my-2 px-2 lg:px-5"><a type="button" href="{{ url_for('users.dash_acc_settings') }}" class="text-sm hover:text-blueish">Settings</a></li>
                             <li class="block my-2 px-2 lg:px-5"><a href="{{ url_for('users.user_logout') }}" class="text-sm hover:text-blueish">Logout</a></li>
                         </ul>
+                        {% endcache %}
                     </nav>
                 </div>
+                
                 <!-- top menu for small and mobile devices -->
                 <div class="bg-gray-100 block w-full bg-white md:hidden p-3 fixed top-0 z-50">
                     <div class="flex justify-between items-center">
@@ -66,7 +70,7 @@
                             </div>
                             <h3 class="tracking-wide ml-3 hidden mobile-username"><a href="#">@{{ current_user.username }}</a></h3>
                         </div>
-
+                        {% cache None %}
                         <div class="text-xl flex items-center">
                             <a href="{{ url_for('users.dashboard') }}" type="button" class="px-3 py-1 border-2 border-blue rounded-lg text-blue mr-2 text-sm sm:text-base hover:bg-blue hover:text-white flex items-center"><i class="fas fa-book-open mr-1"></i>New Story</a>
                             <button class="focus:outline-none" @click="open=!open"
@@ -76,12 +80,14 @@
                                 <i x-show="open" class="fas fa-times"></i>
                             </button>
                         </div>
+                        {% endcache %}
                     </div>
                     <div class="mt-2 md:flex text-center"
                         :class="{'block':open, 'hidden':!open}"
                         x-show="true"
                         @click.away = "open=false">
                         <a type="button" href="{{ url_for('users.dash_profile', user=current_user.username) }}" :class="{ 'active': tab === 'user_profile' }" @click="tab = 'user_profile'" type="button" class="px-4 py-1 bg-pinkish text-white text-sm hover:bg-blue rounded"><i class="fas fa-user-circle mr-2"></i>Profile</a>
+                        {% cache None %}
                         <ul class="block py-3">
                             <li class="block my-3 px-2 lg:px-5"><a type="button" href="{{ url_for('users.dashboard') }}" class="hover:text-pinkish text-base tracking-wide"><i class="fas fa-book mr-2"></i>Stories</a></li>
                             <li class="block my-3 px-2 lg:px-5"><a type="button" href="{{ url_for('users.dash_discover') }}" class="hover:text-pinkish text-base tracking-wide"><i class="fas fa-globe mr-2"></i>Discover</a></li>
@@ -93,6 +99,7 @@
                             <li class="block my-3 px-2 lg:px-5"><a type="button" href="{{ url_for('users.dash_acc_settings') }}" class="text-sm hover:text-blueish">Settings</a></li>
                             <li class="block my-3 px-2 lg:px-5"><a href="{{ url_for('users.user_logout') }}" class="text-sm hover:text-blueish">Logout</a></li>
                         </ul>
+                        {% endcache %}
                     </div>
                 </div>
             </div>
@@ -117,6 +124,7 @@
         });
     </script> -->
 
+   {% cache None %}
    {% if user == current_user %}
         <!-- modal > image upload -->
     <script type="text/javascript">
@@ -220,5 +228,6 @@
             }
         }
     </script>
+    {% endcache %}
 </body>
 </html>
