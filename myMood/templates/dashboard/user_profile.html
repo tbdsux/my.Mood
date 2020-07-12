@@ -92,17 +92,17 @@
             <!-- end UPDATE PROFILE PICTURE -->
 
             <!-- user bg photo -->
-            <button type="button" class="cursor-default w-full h-full focus:outline-none" onmouseenter="showUpUserBG()" onmouseleave="hideUpUserBG()">
+            <button type="button" class="cursor-default w-full h-full focus:outline-none">
                 <img src="{{ url_for('static', filename='profile_pics/bg_profile/' + user.acc_image_bg) }}" alt="" class="h-full w-full object-cover object-top">
                 {% if user == current_user %}
-                    <a id="editUBG" @click="showModalBgImg = true" type="button" class="cursor-pointer hidden absolute top-0 right-0 text-xs sm:text-sm bg-darkish text-gray-500 py-1 px-2 opacity-75 hover:opacity-100 rounded-lg">Change Background</a>
+                    <a id="editUBG" @click="showModalBgImg = true" type="button" class="cursor-pointer absolute top-0 right-0 text-xs sm:text-sm bg-darkish text-gray-500 py-1 px-2 opacity-75 hover:opacity-100 rounded-lg">Change Background</a>
                 {% endif %}
             </button>
             <!-- user image -->
-            <button type="button" class="cursor-default absolute h-24 sm:h-32 w-24 sm:w-32 bottom-0 left-50 -ml-12 sm:-ml-16 -mb-4 sm:-mb-8 focus:outline-none" onmouseenter="showUpUserPF()" onmouseleave="hideUpUserPF()">
+            <button type="button" class="cursor-default absolute h-24 sm:h-32 w-24 sm:w-32 bottom-0 left-50 -ml-12 sm:-ml-16 -mb-4 sm:-mb-8 focus:outline-none">
                 <img src="{{ url_for('static', filename='profile_pics/' + user.acc_image) }}" alt="" class="w-full h-full object-cover rounded-full">
                 {% if user == current_user %}
-                    <a id="editUPF" @click="showModalPfImg = true" type="button" class="cursor-pointer hidden absolute bottom-0 left-50 text-xs sm:text-sm bg-darkish text-gray-500 py-1 px-3 opacity-75 -ml-8 -mb-1 hover:opacity-100 rounded-lg">Update</a>
+                    <a id="editUPF" @click="showModalPfImg = true" type="button" class="cursor-pointer absolute bottom-0 left-50 text-xs sm:text-sm bg-darkish text-gray-500 py-1 px-3 opacity-75 -ml-8 -mb-1 hover:opacity-100 rounded-lg">Update</a>
                 {% endif %}
             </button>
         </div>
