@@ -169,6 +169,7 @@ def follow_user(user_to_follow):
             db.session.commit()
             cache.delete_memoized(query_user_profile, user_to_follow)
             cache.delete("user_stories")
+            cache.delete_memoized(dash_profile, user_to_follow)
             return redirect(url_for("users.dash_profile", user=user_to_follow))
 
 
@@ -183,12 +184,13 @@ def unfollow_user(user_to_unfollow):
             db.session.commit()
             cache.delete_memoized(query_user_profile, user_to_follow)
             cache.delete("user_stories")
+            cache.delete_memoized(dash_profile, user_to_follow)
             return redirect(url_for("users.dash_profile", user=user_to_unfollow))
 
 
 # User Profile
 @users.route("/u/<user>", methods=["GET"])
-@cache.cached(key_prefix="dash_profile")
+@cache.memoize()
 def dash_profile(user):
     formUpProfile = UpdateProfile()
     formUpProfilePic = UpdateProfilePic()
@@ -268,7 +270,7 @@ def update_BgImage(user):
                 current_user.acc_image_bg = pic_file
                 db.session.commit()
                 cache.delete_memoized(query_user_profile, user)
-                cache.delete("dash_profile")
+                cache.delete_memoized(dash_profile, user)
                 return redirect(
                     url_for("users.dash_profile", user=current_user.username)
                 )
@@ -295,7 +297,7 @@ def update_ProfilePic(user):
                 current_user.acc_image = pic_file
                 db.session.commit()
                 cache.delete_memoized(query_user_profile, user)
-                cache.delete("dash_profile")
+                cache.delete_memoized(dash_profile, user)
                 return redirect(
                     url_for("users.dash_profile", user=current_user.username)
                 )
@@ -311,7 +313,7 @@ def update_Profile(user):
             current_user.random_say = formUpProfile.random_say.data
             db.session.commit()
             cache.delete_memoized(query_user_profile, user)
-            cache.delete("dash_profile")
+            cache.delete_memoized(dash_profile, user)
             return redirect(url_for("users.dash_profile", user=current_user.username))
     return redirect(url_for("users.dash_profile", user=current_user.username))
 
@@ -325,7 +327,7 @@ def update_Whoami(user):
             current_user.whoami = formUpWhoami.whoami.data
             db.session.commit()
             cache.delete_memoized(query_user_profile, user)
-            cache.delete("dash_profile")
+            cache.delete_memoized(dash_profile, user)
             return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
@@ -341,7 +343,7 @@ def update_SocialLinks(user):
             current_user.social_yt = formUpSocialLinks.yt.data
             db.session.commit()
             cache.delete_memoized(query_user_profile, user)
-            cache.delete("dash_profile")
+            cache.delete_memoized(dash_profile, user)
             return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
