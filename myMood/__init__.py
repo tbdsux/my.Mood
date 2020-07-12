@@ -5,6 +5,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_compress import Compress
+from flask_assets import Environment, Bundle
 from flask_caching import Cache
 
 # import pylibmc
@@ -21,6 +22,7 @@ login_manager.session_protection = "strong"
 mail = Mail()
 compress = Compress()
 cache = Cache()
+assets = Environment()
 # sess = Session()
 
 
@@ -34,11 +36,15 @@ def create_app(config_class=ProdConfig):
     login_manager.init_app(app)
     mail.init_app(app)
     compress.init_app(app)
+    assets.init_app(app)
     # sess.init_app(app)
+
+    css = Bundle("css/build.css")
+    assets.register("main_css", css)
 
     cache.init_app(app, config={"CACHE_TYPE": "simple"})
     # Using Memcache
-    cache_servers = os.environ.get("MEMCACHIER_SERVERS")
+    # cache_servers = os.environ.get("MEMCACHIER_SERVERS")
     # if cache_servers == None:
     #     cache_servers = os.environ.get("MEMCACHIER_SERVERS")
     # else:
