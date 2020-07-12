@@ -18,7 +18,6 @@ from myMood.stories.query import (
     query_public_stories,
     query_def_stories,
     query_all_stories,
-    query_user_story,
 )
 from myMood.users.query import (
     query_user_profile,
@@ -57,7 +56,7 @@ def is_post():
 def user_login():
     # bypass if user is authenticated
     if current_user.is_authenticated:
-        return redirect(url_for("main.home"))
+        return redirect(url_for("main.dashboard"))
 
     form = LoginForm()
 
@@ -85,7 +84,7 @@ def user_login():
 def user_register():
     # bypass if user is authenticated
     if current_user.is_authenticated:
-        return redirect(url_for("main.home"))
+        return redirect(url_for("users.dashboard"))
 
     form = RegisterForm()
 
@@ -130,7 +129,8 @@ def dashboard():
         return redirect(url_for("main.home"))
     # s = current_user
     # page = request.args.get("stories", 1, type=int)
-    stories = query_def_stories()
+    s = current_user
+    stories = s.followed_posts().limit(10).all()
     # stories = Post.query.filter_by(author=current_user).order_by(
     #     Post.date_posted.desc()
     # )
@@ -182,9 +182,9 @@ def unfollow_user(user_to_unfollow):
             target_user = User.query.filter_by(username=user_to_unfollow).first()
             current_user.unfollow(target_user)
             db.session.commit()
-            cache.delete_memoized(query_user_profile, user_to_follow)
+            cache.delete_memoized(query_user_profile, user_to_unfollow)
             cache.delete("user_stories")
-            cache.delete_memoized(dash_profile, user_to_follow)
+            cache.delete_memoized(dash_profile, user_to_unfollow)
             return redirect(url_for("users.dash_profile", user=user_to_unfollow))
 
 
@@ -209,6 +209,8 @@ def dash_profile(user):
         formUpSocialLinks.yt.data = current_user.social_yt
 
     username = query_user_profile(user)
+    if username != current_user:
+        cache.delete_memoized(dash_profile, user)
     # stories = Post.query.filter_by(author=username).order_by(Post.date_posted.desc())
     if current_user == username:
         stories = (

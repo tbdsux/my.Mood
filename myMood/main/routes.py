@@ -8,12 +8,11 @@ from sqlalchemy.sql.expression import func
 main = Blueprint("main", __name__)
 
 
-def is_post():
-    return request.method == "POST"
-
-
 @main.route("/home", methods=["GET", "POST"])
 def home():
+    if current_user.is_authenticated:
+        return redirect(url_for("users.dashboard"))
+
     form = RegisterForm()
 
     if request.method == "POST":

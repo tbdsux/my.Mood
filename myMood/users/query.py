@@ -4,7 +4,7 @@ from myMood.models import User, Post
 
 
 # start caching current_user
-@cache.memoize()
+@cache.memoize(timeout=5)
 def query_user_profile(user):
     return User.query.filter_by(username=user).first_or_404()
 

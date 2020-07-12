@@ -10,7 +10,7 @@ from flask_caching import Cache
 
 # import pylibmc
 # from flask_session import Session
-from myMood.config import ProdConfig
+from myMood.config import ProdConfig, DevConfig
 import os
 
 db = SQLAlchemy()
@@ -26,9 +26,9 @@ assets = Environment()
 # sess = Session()
 
 
-def create_app(config_class=ProdConfig):
+def create_app(config_class=DevConfig):
     app = Flask(__name__)
-    app.config.from_object(ProdConfig)
+    app.config.from_object(DevConfig)
     migrate = Migrate(app, db)
 
     db.init_app(app)

@@ -35,7 +35,7 @@
                         <div class="relative h-20 lg:h-24 w-20 lg:w-24 mx-auto">
                             <img src="{{ url_for('static', filename='profile_pics/' + current_user.acc_image) }}" alt="" class="absolute h-full w-full object-cover rounded-full flex-grow">
                         </div>
-                        <h3 class="tracking-wide py-3"><a href="#">@{{ current_user.username }}</a></h3>
+                        <h3 class="tracking-wide py-3"><a href="{{ url_for('users.dash_profile', user=current_user.username) }}">@{{ current_user.username }}</a></h3>
                         <a type="button" href="{{ url_for('users.dash_profile', user=current_user.username) }}" :class="{ 'active': tab === 'user_profile' }" @click="tab = 'user_profile'" type="button" class="px-4 py-1 bg-pinkish text-white text-sm hover:bg-blue hover:bg-blue rounded"><i class="fas fa-user-circle mr-2"></i>Profile</a>
                     </div>
 
@@ -70,7 +70,7 @@
                             <div class="relative h-12 sm:h-16 w-12 sm:w-16 mx-auto">
                                 <img src="{{ url_for('static', filename='profile_pics/' + current_user.acc_image) }}" alt="" class="absolute h-full w-full object-cover rounded-full flex-grow">
                             </div>
-                            <h3 class="tracking-wide ml-3 hidden mobile-username"><a href="#">@{{ current_user.username }}</a></h3>
+                            <h3 class="tracking-wide ml-3 hidden mobile-username"><a href="{{ url_for('users.dash_profile', user=current_user.username) }}">@{{ current_user.username }}</a></h3>
                         </div>
                         {% cache None %}
                         <div class="text-xl flex items-center">

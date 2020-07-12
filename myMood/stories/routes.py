@@ -8,21 +8,16 @@ from myMood.stories.query import (
     query_all_stories,
     query_def_stories,
     query_all_user_stories,
-    query_user_story,
 )
 
 stories = Blueprint("stories", __name__)
-
-
-def is_post():
-    return request.method == "POST"
 
 
 @stories.route("/u/<user>/stories/<int:story_id>", methods=["GET"])
 @cache.memoize()
 def user_post(user, story_id):
     form = NewStoryForm()
-    story = query_user_story(story_id)
+    story = Post.query.get_or_404(story_id)
     if request.method == "GET":
         form.content.data = story.content
         form.emotion.data = story.emotion
@@ -35,7 +30,7 @@ def user_post(user, story_id):
 # update post
 @stories.route("/u/<user>/stories/<int:story_id>/update", methods=["GET", "POST"])
 def update_post(user, story_id):
-    story = query_user_story(story_id)
+    story = Post.query.get_or_404(story_id)
     if story.author != current_user:
         return redirect(url_for("users.dash_profile", user=story.author.username))
     form = NewStoryForm()
@@ -45,8 +40,7 @@ def update_post(user, story_id):
             story.emotion = form.emotion.data
             story.state = form.state.data
             db.session.commit()
-            cache.delete_memoized(query_user_story, story_id)
-            cache.delete_memoized(user_post)
+            cache.delete_memoized(user_post, story.author.username, story_id)
             return redirect(
                 url_for(
                     "stories.user_post", user=current_user.username, story_id=story.id
@@ -63,8 +57,7 @@ def delete_post(user, story_id):
     if request.method == "POST":
         db.session.delete(story)
         db.session.commit()
-        cache.delete_memoized(query_user_story, story_id)
-        cache.delete_memoized(user_post)
+        cache.delete_memoized(user_post, story.author.username, story_id)
         return redirect(url_for("users.dash_profile", user=current_user.username))
 
 
