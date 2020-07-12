@@ -263,7 +263,10 @@ def update_BgImage(user):
                         "static\\profile_pics\\bg_profile",
                         current_user.acc_image_bg,
                     )
-                    os.remove(pp_path)
+                    try:
+                        os.remove(pp_path)
+                    except FileNotFoundError:
+                        pass
 
                 # change the background pic
                 pic_file = save_bg_image(formUpBgImage.image_background.data)
@@ -290,7 +293,10 @@ def update_ProfilePic(user):
                         "static\\profile_pics",
                         current_user.acc_image,
                     )
-                    os.remove(pp_path)
+                    try:
+                        os.remove(pp_path)
+                    except FileNotFoundError:
+                        pass
 
                 # change the profile pic
                 pic_file = save_profile_pic(formUpProfilePic.profile_pic.data)
